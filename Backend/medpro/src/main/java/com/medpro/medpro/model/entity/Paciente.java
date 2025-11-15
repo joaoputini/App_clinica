@@ -1,5 +1,6 @@
 package com.medpro.medpro.model.entity;
 
+import com.medpro.medpro.model.dto.DadosAtualizacaoPaciente; 
 import com.medpro.medpro.model.dto.DadosCadastroPaciente;
 
 import jakarta.persistence.Embedded;
@@ -19,9 +20,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-
-
 public class Paciente {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,12 +33,35 @@ public class Paciente {
     @Embedded
     private Endereco endereco;
 
+    private Boolean ativo; 
+
     public Paciente(DadosCadastroPaciente dados) {
-      this.nome = dados.nome();
-      this.email = dados.email();
-      this.telefone = dados.telefone();
-      this.cpf = dados.cpf();
-      this.endereco = new Endereco(dados.endereco());  
+        this.nome = dados.nome();
+        this.email = dados.email();
+        this.telefone = dados.telefone();
+        this.cpf = dados.cpf();
+        this.endereco = new Endereco(dados.endereco());
+        this.ativo = true; 
     }
-    
+
+
+    public void atualizarInformacoes(DadosAtualizacaoPaciente dados) {
+        if (dados.nome() != null) {
+            if (dados.nome().isBlank())
+                throw new IllegalArgumentException("nome não pode estar em branco");
+            this.nome = dados.nome();
+        }
+        if (dados.telefone() != null) {
+            if (dados.telefone().isBlank())
+                throw new IllegalArgumentException("telefone não pode estar em branco");
+            this.telefone = dados.telefone(); 
+        }
+        if (dados.endereco() != null) {
+            this.endereco.atualizarInformacoes(dados.endereco());
+        }
+    }
+
+    public void excluir() {
+        this.ativo = false;
+    }
 }
